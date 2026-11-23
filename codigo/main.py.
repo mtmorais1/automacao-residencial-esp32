@@ -1,25 +1,47 @@
+
 from machine import Pin, ADC
 import dht
 import time
 
+# LED
 led = Pin(23, Pin.OUT)
+
+# Botao
 botao = Pin(18, Pin.IN, Pin.PULL_UP)
 
+# Sensor de luminosidade
 ldr = ADC(Pin(34))
 ldr.atten(ADC.ATTN_11DB)
 
+# Sensor de temperatura e umidade
 dht22 = dht.DHT22(Pin(15))
+
+# Sensor de presenca
 pir = Pin(27, Pin.IN)
 
+# Configuracoes
 ultimo_movimento = time.ticks_ms()
-tempo_luz = 10000  # 10 segundos
+tempo_luz = 10000
+
+luz_manual = False
+ultimo_estado_botao = 1
 
 while True:
     luminosidade = ldr.read()
     movimento = pir.value()
+    estado_botao = botao.value()
 
+    # Botao como interruptor
+    if estado_botao == 0 and ultimo_estado_botao == 1:
+        luz_manual = not luz_manual
+        time.sleep_ms(200)
+
+    ultimo_estado_botao = estado_botao
+
+    # Identificar ambiente escuro
     escuro = luminosidade > 1000
 
+    # Registrar movimento
     if movimento == 1 and escuro:
         ultimo_movimento = time.ticks_ms()
 
@@ -29,21 +51,35 @@ while True:
 
     presenca_recente = tempo_passado < tempo_luz
 
-    if botao.value() == 0 or (presenca_recente and escuro):
+    # Controle da iluminacao
+    if luz_manual or (presenca_recente and escuro):
         led.value(1)
     else:
         led.value(0)
 
+    # Leitura de temperatura e umidade
     try:
         dht22.measure()
-        print("Luminosidade:", luminosidade)
-        print("Temperatura:", dht22.temperature(), "C")
-        print("Umidade:", dht22.humidity(), "%")
+        temperatura = dht22.temperature()
+        umidade = dht22.humidity()
+
+        print("Temperatura:", temperatura, "C")
+        print("Umidade:", umidade, "%")
+
     except OSError:
         print("Erro na leitura do DHT22")
 
+    # Informacoes dos sensores
+    print("Luminosidade:", luminosidade)
     print("Ambiente escuro" if escuro else "Ambiente claro")
-    print("Presenca detectada!" if movimento else "Sem movimento")
+
+    if movimento == 1:
+        print("PRESENCA DETECTADA!")
+    else:
+        print("AMBIENTE SEM MOVIMENTO!")
+
+    print("Luz manual:", "Ligada" if luz_manual else "Desligada")
+    print("LED:", "Ligado" if led.value() else "Desligado")
     print("--------------------")
 
-    time.sleep(1)
+    time.sleep(0.2)
