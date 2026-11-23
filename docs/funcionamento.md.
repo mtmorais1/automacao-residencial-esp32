@@ -26,6 +26,13 @@ O sistema monitora as condições do ambiente e permite controlar a iluminação
 - O DHT22 mede a temperatura e a umidade.
 - O ESP32 realiza a leitura dos sensores e controla o LED.
 
+Controle manual da iluminação
+
+O sistema possui um botão físico que funciona como interruptor.
+- Primeiro acionamento: liga a iluminação.
+- Segundo acionamento: desliga a iluminação.
+- O controle manual funciona independentemente da luminosidade do ambiente.
+
  4. Tecnologias
 
 - ESP32
