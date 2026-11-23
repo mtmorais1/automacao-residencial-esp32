@@ -78,3 +78,11 @@ Projeto em desenvolvimento.
 Os códigos, diagramas, imagens da montagem, arquivos de simulação e resultados dos testes serão adicionados a este repositório conforme o desenvolvimento avançar.
 
 Projeto acadêmico – Automação Residencial Inteligente com ESP32.
+
+
+ 8. Simulação no Wokwi
+
+[Acessar simulação do projeto](https://wokwi.com/projects/481435168017247233 )
+
+
+
