@@ -1,0 +1,46 @@
+from machine import Pin, ADC
+import dht
+import time
+
+# LED
+led = Pin(23, Pin.OUT)
+
+# Botao
+botao = Pin(18, Pin.IN, Pin.PULL_UP)
+
+# Sensor de luminosidade
+ldr = ADC(Pin(34))
+ldr.atten(ADC.ATTN_11DB)
+
+# Sensor de temperatura e umidade
+dht22 = dht.DHT22(Pin(15))
+
+# Sensor de presenca
+pir = Pin(27, Pin.IN)
+
+while True:
+    luminosidade = ldr.read()
+    movimento = pir.value()
+
+    if botao.value() == 0 or movimento == 1:
+        led.value(1)
+    else:
+        led.value(0)
+
+    try:
+        dht22.measure()
+
+        print("Luminosidade:", luminosidade)
+        print("Temperatura:", dht22.temperature(), "C")
+        print("Umidade:", dht22.humidity(), "%")
+
+        if movimento == 1:
+            print("Presenca detectada!")
+        else:
+            print("Ambiente sem movimento")
+
+    except OSError:
+        print("Erro na leitura do DHT22")
+
+    print("--------------------")
+    time.sleep(2)
